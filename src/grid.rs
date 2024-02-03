@@ -31,29 +31,6 @@ impl Grid {
         }
     }
 
-    /// Draws the grid to stdout
-    pub fn draw(&self) -> io::Result<()> {
-        let mut stdout = io::stdout();
-
-        execute!(
-            stdout,
-            cursor::MoveTo(0, 0),
-            terminal::Clear(terminal::ClearType::All)
-        )?;
-
-        for (y, row) in self.grid.iter().enumerate() {
-            for (x, cell) in row.iter().enumerate() {
-                if *cell {
-                    draw_particle(&mut stdout, x.try_into().unwrap(), y.try_into().unwrap())?;
-                }
-            }
-        }
-
-        stdout.flush()?;
-
-        Ok(())
-    }
-
     /// Sets the given cell to true if the cell is in range
     ///
     /// # Parameters
@@ -66,8 +43,10 @@ impl Grid {
         }
     }
 
-    /// Updates the state of the grid, making particles fall
-    pub fn update(&mut self) {
+    /// Updates and draws the state of the grid, making particles fall
+    pub fn update(&mut self) -> io::Result<()> {
+        let mut stdout = io::stdout();
+
         // Couple of notes
         // - Skipping the bottom row as it will never need updating
         // - Reversing the ranges to go bottom up so that a particle doesn't get moved more than
@@ -81,23 +60,34 @@ impl Grid {
                 if cell {
                     if !cell_below {
                         self.grid[y][x] = false;
+                        erase_particle(&mut stdout, x as u16, y as u16)?;
+
                         self.grid[y + 1][x] = true;
+                        draw_particle(&mut stdout, x as u16, (y + 1) as u16)?;
                     } else {
                         let left_chance = rand::thread_rng().gen_range(1..=100) > 50;
 
                         if left_chance && x > 0 && !self.grid[y + 1][x - 1] {
                             self.grid[y][x] = false;
+                            erase_particle(&mut stdout, x as u16, y as u16)?;
+
                             self.grid[y + 1][x - 1] = true;
+                            draw_particle(&mut stdout, (x - 1) as u16, (y + 1) as u16)?;
                         }
 
                         if x < (self.width - 1) && !self.grid[y + 1][x + 1] {
                             self.grid[y][x] = false;
+                            erase_particle(&mut stdout, x as u16, y as u16)?;
+
                             self.grid[y + 1][x + 1] = true;
+                            draw_particle(&mut stdout, (x + 1) as u16, (y + 1) as u16)?;
                         }
                     }
                 }
             }
         }
+
+        stdout.flush()
     }
 }
 
@@ -123,6 +113,26 @@ fn draw_particle(stdout: &mut Stdout, x: u16, y: u16) -> io::Result<()> {
         SetBackgroundColor(Color::White),
         Print("  "),
         SetBackgroundColor(Color::Reset),
+    )?;
+
+    stdout.flush()
+}
+
+/// Erases a particle at the given coordinates
+///
+/// **NOTE** A particle is actually two chars wide, to make a square.
+///          This is accounted for in the function.
+///
+/// # Parameters
+///
+/// - `x` The column of the cell to draw, with 0 being the leftmost cell
+/// - `y` The row of the cell to draw, with 0 being the top of the screen
+fn erase_particle(stdout: &mut Stdout, x: u16, y: u16) -> io::Result<()> {
+    execute!(
+        stdout,
+        cursor::MoveTo(x * 2, y),
+        SetBackgroundColor(Color::Reset),
+        Print("  "),
     )?;
 
     stdout.flush()

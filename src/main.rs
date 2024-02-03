@@ -46,8 +46,7 @@ fn main() -> io::Result<()> {
             }
         }
 
-        grid.update();
-        grid.draw()?;
+        grid.update()?;
     }
 
     terminal::disable_raw_mode()?;
