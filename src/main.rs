@@ -44,6 +44,7 @@ fn main() -> io::Result<()> {
             _ => (),
         }
 
+        grid.update();
         grid.draw()?;
     }
 
