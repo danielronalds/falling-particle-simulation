@@ -12,7 +12,9 @@ use grid::Grid;
 fn main() -> io::Result<()> {
     let mut stdout = io::stdout();
 
-    let mut grid = Grid::default();
+    let (width, height) = crossterm::terminal::size().unwrap_or((80, 50));
+
+    let mut grid = Grid::new(width as usize, height as usize);
 
     terminal::enable_raw_mode()?;
 
