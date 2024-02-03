@@ -3,6 +3,7 @@ use crossterm::{
     style::{Color, Print, SetBackgroundColor},
     terminal,
 };
+use rand::Rng;
 use std::io::{self, Stdout, Write};
 
 pub struct Grid {
@@ -81,12 +82,18 @@ impl Grid {
                     if !cell_below {
                         self.grid[y][x] = false;
                         self.grid[y + 1][x] = true;
-                    } else if x > 0 && !self.grid[y + 1][x - 1] {
-                        self.grid[y][x] = false;
-                        self.grid[y + 1][x - 1] = true;
-                    } else if x < (self.width-1) && !self.grid[y + 1][x + 1] {
-                        self.grid[y][x] = false;
-                        self.grid[y + 1][x + 1] = true;
+                    } else {
+                        let left_chance = rand::thread_rng().gen_range(1..=100) > 50;
+
+                        if left_chance && x > 0 && !self.grid[y + 1][x - 1] {
+                            self.grid[y][x] = false;
+                            self.grid[y + 1][x - 1] = true;
+                        }
+
+                        if x < (self.width - 1) && !self.grid[y + 1][x + 1] {
+                            self.grid[y][x] = false;
+                            self.grid[y + 1][x + 1] = true;
+                        }
                     }
                 }
             }
