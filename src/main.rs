@@ -1,4 +1,8 @@
-use crossterm::{cursor, execute, terminal};
+use crossterm::{
+    cursor,
+    event::{self, read, Event, KeyCode, KeyEvent, MouseEventKind},
+    execute, terminal,
+};
 
 use std::io;
 use std::thread;
@@ -13,13 +17,45 @@ fn main() -> io::Result<()> {
 
     grid.toggle_cell(3, 8);
 
-    execute!(stdout, terminal::EnterAlternateScreen, cursor::Hide)?;
+    terminal::enable_raw_mode()?;
 
-    let _ = grid.draw();
+    execute!(
+        stdout,
+        terminal::EnterAlternateScreen,
+        cursor::Hide,
+        event::EnableMouseCapture
+    )?;
 
-    thread::sleep_ms(3000);
+    loop {
+        match read()? {
+            Event::Key(event) => {
+                if event.code == KeyCode::Char('q') {
+                    break;
+                }
+            }
+            Event::Mouse(event) => {
+                if event.kind == MouseEventKind::Down(event::MouseButton::Left)
+                    || event.kind == MouseEventKind::Drag(event::MouseButton::Left)
+                {
+                    let x = (event.column / 2) as usize;
+                    let y = event.row as usize;
+                    grid.toggle_cell(x, y);
+                }
+            }
+            _ => (),
+        }
 
-    execute!(stdout, terminal::LeaveAlternateScreen, cursor::Show)?;
+        grid.draw()?;
+    }
+
+    terminal::disable_raw_mode()?;
+
+    execute!(
+        stdout,
+        terminal::LeaveAlternateScreen,
+        cursor::Show,
+        event::DisableMouseCapture
+    )?;
 
     Ok(())
 }

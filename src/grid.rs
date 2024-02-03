@@ -3,7 +3,7 @@ use crossterm::{
     style::{Color, Print, SetBackgroundColor},
     terminal,
 };
-use std::io::{self, Stdout};
+use std::io::{self, Stdout, Write};
 
 pub struct Grid {
     grid: Vec<Vec<bool>>,
@@ -44,10 +44,12 @@ impl Grid {
             }
         }
 
+        stdout.flush()?;
+
         Ok(())
     }
 
-    /// Toggles the given cell if the cell is in range
+    /// Sets the given cell to true if the cell is in range
     ///
     /// # Parameters
     ///
@@ -55,7 +57,7 @@ impl Grid {
     /// - `y` The row of the cell to toggle, with 0 being the top of the screen
     pub fn toggle_cell(&mut self, x: usize, y: usize) {
         if x < self.width && y  < self.height {
-            self.grid[y][x] = !self.grid[y][x];
+            self.grid[y][x] = true;
         }
     }
 
@@ -85,7 +87,7 @@ fn draw_particle(stdout: &mut Stdout, x: u16, y: u16) -> io::Result<()> {
         SetBackgroundColor(Color::Reset),
     )?;
 
-    Ok(())
+    stdout.flush()
 }
 
 #[cfg(test)]
