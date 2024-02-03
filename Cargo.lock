@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "falling-sand-simulation"
+name = "falling-partical-simulation"
 version = "0.1.0"
 dependencies = [
  "crossterm",
