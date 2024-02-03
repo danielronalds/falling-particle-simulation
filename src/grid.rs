@@ -1,7 +1,6 @@
 use crossterm::{
     cursor, execute,
     style::{Color, Print, SetBackgroundColor},
-    terminal,
 };
 use rand::Rng;
 use std::io::{self, Stdout, Write};
