@@ -67,9 +67,12 @@ impl Grid {
 
     /// Updates the state of the grid, making particles fall
     pub fn update(&mut self) {
-        for y in 0..(self.height - 1) {
-            // Skipping the bottom row as it will never need updating
-            for x in 0..self.width {
+        // Couple of notes
+        // - Skipping the bottom row as it will never need updating
+        // - Reversing the ranges to go bottom up so that a particle doesn't get moved more than
+        //   once
+        for y in (0..(self.height - 1)).rev() {
+            for x in (0..self.width).rev() {
                 let cell = self.grid[y][x];
 
                 let cell_below = self.grid[y + 1][x];
@@ -81,7 +84,7 @@ impl Grid {
                     } else if x > 0 && !self.grid[y + 1][x - 1] {
                         self.grid[y][x] = false;
                         self.grid[y + 1][x - 1] = true;
-                    } else if x < (self.width - 1) && !self.grid[y + 1][x + 1] {
+                    } else if x < (self.width-1) && !self.grid[y + 1][x + 1] {
                         self.grid[y][x] = false;
                         self.grid[y + 1][x + 1] = true;
                     }

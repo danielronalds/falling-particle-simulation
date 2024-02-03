@@ -4,7 +4,7 @@ use crossterm::{
     execute, terminal,
 };
 
-use std::io;
+use std::{io, time::Duration};
 
 mod grid;
 use grid::Grid;
@@ -13,8 +13,6 @@ fn main() -> io::Result<()> {
     let mut stdout = io::stdout();
 
     let mut grid = Grid::default();
-
-    grid.toggle_cell(3, 8);
 
     terminal::enable_raw_mode()?;
 
@@ -26,22 +24,24 @@ fn main() -> io::Result<()> {
     )?;
 
     loop {
-        match read()? {
-            Event::Key(event) => {
-                if event.code == KeyCode::Char('q') {
-                    break;
+        if event::poll(Duration::from_millis(16))? {
+            match read()? {
+                Event::Key(event) => {
+                    if event.code == KeyCode::Char('q') {
+                        break;
+                    }
                 }
-            }
-            Event::Mouse(event) => {
-                if event.kind == MouseEventKind::Down(event::MouseButton::Left)
-                    || event.kind == MouseEventKind::Drag(event::MouseButton::Left)
-                {
-                    let x = (event.column / 2) as usize;
-                    let y = event.row as usize;
-                    grid.toggle_cell(x, y);
+                Event::Mouse(event) => {
+                    if event.kind == MouseEventKind::Down(event::MouseButton::Left)
+                        || event.kind == MouseEventKind::Drag(event::MouseButton::Left)
+                    {
+                        let x = (event.column / 2) as usize;
+                        let y = event.row as usize;
+                        grid.toggle_cell(x, y);
+                    }
                 }
+                _ => (),
             }
-            _ => (),
         }
 
         grid.update();
