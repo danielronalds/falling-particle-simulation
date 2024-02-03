@@ -23,7 +23,11 @@ impl Grid {
 
         let grid = vec![vec![false; width]; height];
 
-        Grid { grid, width, height }
+        Grid {
+            grid,
+            width,
+            height,
+        }
     }
 
     /// Draws the grid to stdout
@@ -56,11 +60,10 @@ impl Grid {
     /// - `x` The column of the cell to toggle, with 0 being the leftmost cell
     /// - `y` The row of the cell to toggle, with 0 being the top of the screen
     pub fn toggle_cell(&mut self, x: usize, y: usize) {
-        if x < self.width && y  < self.height {
+        if x < self.width && y < self.height {
             self.grid[y][x] = true;
         }
     }
-
 }
 
 impl Default for Grid {
@@ -71,7 +74,7 @@ impl Default for Grid {
 
 /// Draws a particle at the given coordinates
 ///
-/// **NOTE** A particle is actually two chars wide, to make a square. 
+/// **NOTE** A particle is actually two chars wide, to make a square.
 ///          This is accounted for in the function.
 ///
 /// # Parameters
@@ -105,17 +108,16 @@ mod tests {
 
     #[test]
     fn toggle_cell_works() {
-        let mut grid = Grid::new(3,3);
+        let mut grid = Grid::new(3, 3);
 
         grid.toggle_cell(1, 2);
 
         let expected = vec![
-            vec![false, false, false], 
             vec![false, false, false],
-            vec![false, true, false]
+            vec![false, false, false],
+            vec![false, true, false],
         ];
 
         assert_eq!(grid.grid, expected);
-
     }
 }

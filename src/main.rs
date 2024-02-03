@@ -1,11 +1,10 @@
 use crossterm::{
     cursor,
-    event::{self, read, Event, KeyCode, KeyEvent, MouseEventKind},
+    event::{self, read, Event, KeyCode, MouseEventKind},
     execute, terminal,
 };
 
 use std::io;
-use std::thread;
 
 mod grid;
 use grid::Grid;
